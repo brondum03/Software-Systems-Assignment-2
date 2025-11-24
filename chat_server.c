@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
     while (1) 
     {
         // Storage for request and response messages
-        char client_request[BUFFER_SIZE], server_response[BUFFER_SIZE];
+        // Added storage for client's port
+        char client_request[BUFFER_SIZE], server_response[BUFFER_SIZE], client_port[6];
 
         // Demo code (remove later)
         printf("Server is listening on port %d\n", SERVER_PORT);
@@ -34,8 +35,12 @@ int main(int argc, char *argv[])
         if (rc > 0)
         {
             // Demo code (remove later)
+            int client_port_int = ntohs(client_address.sin_port);
+            snprintf(client_port, sizeof(client_port), "%d", client_port_int);
             strcpy(server_response, "Hi, the server has received: ");
             strcat(server_response, client_request);
+            strcat(server_response, " from port ");
+            strcat(server_response, client_port);
             strcat(server_response, "\n");
 
             // This function writes back to the incoming client,
