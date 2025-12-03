@@ -1,55 +1,91 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
 #include "udp.h"
 
-#define CLIENT_PORT 10000
+#define BUFFER_SIZE 1024
 
-// client code
+typedef struct thread_args {
+    int sd;
+    struct sockaddr_in server_addr;
+} thread_args;
+
+void* sender_thread_function(void *arg);
+void* listener_thread_function(void *arg);
+
 int main(int argc, char *argv[])
 {
-    // This function opens a UDP socket,
-    // binding it to all IP interfaces of this machine,
-    // and port number CLIENT_PORT.
-    // (See details of the function in udp.h)
-    int sd = udp_socket_open(CLIENT_PORT);
+    pthread_t sender_tid, listener_tid;
 
-    // Variable to store the server's IP address and port
-    // (i.e. the server we are trying to contact).
-    // Generally, it is possible for the responder to be
-    // different from the server requested.
-    // Although, in our case the responder will
-    // always be the same as the server.
-    struct sockaddr_in server_addr, responder_addr;
+    // one UDP socket runs both threads
+    int sd = udp_socket_open(0);  // bind client to any available UDP port
+    struct sockaddr_in server_addr;
+    set_socket_addr(&server_addr, "127.0.0.1", SERVER_PORT);
 
-    // Initializing the server's address.
-    // We are currently running the server on localhost (127.0.0.1).
-    // You can change this to a different IP address
-    // when running the server on a different machine.
-    // (See details of the function in udp.h)
-    int rc = set_socket_addr(&server_addr, "127.0.0.1", SERVER_PORT);
+    thread_args *args = malloc(sizeof(thread_args));
+    args->sd = sd;
+    args->server_addr = server_addr;
 
-    // Storage for request and response messages
-    char client_request[BUFFER_SIZE], server_response[BUFFER_SIZE];
+    pthread_create(&sender_tid, NULL, sender_thread_function, args);    // sender thread
+    pthread_create(&listener_tid, NULL, listener_thread_function, args); // listener thread
 
-    // Demo code (remove later)
-    strcpy(client_request, "Dummy Request");
-
-    // This function writes to the server (sends request)
-    // through the socket at sd.
-    // (See details of the function in udp.h)
-    rc = udp_socket_write(sd, &server_addr, client_request, BUFFER_SIZE);
-
-    if (rc > 0)
-    {
-        // This function reads the response from the server
-        // through the socket at sd.
-        // In our case, responder_addr will simply be
-        // the same as server_addr.
-        // (See details of the function in udp.h)
-        int rc = udp_socket_read(sd, &responder_addr, server_response, BUFFER_SIZE);
-
-        // Demo code (remove later)
-        printf("server_response: %s", server_response);
-    }
+    pthread_join(sender_tid, NULL);
+    pthread_join(listener_tid, NULL);
 
     return 0;
+}
+
+void* sender_thread_function(void *arg)
+{
+    thread_args *args = (thread_args *)arg;
+    int sd = args->sd;
+    struct sockaddr_in server_addr = args->server_addr;
+    char input[BUFFER_SIZE];
+
+    while (1)
+    {
+        if (fgets(input, BUFFER_SIZE, stdin) == NULL) 
+        {
+            perror("fgets failed");
+            break;
+        }
+
+        // trim \n at the end
+        size_t len = strlen(input);
+        if (len > 0 && input[len - 1] == '\n') {
+            input[len - 1] = '\0';
+            len--;
+        }
+
+        int rc = udp_socket_write(sd, &server_addr, input, (int)(len + 1));
+        if (rc < 0) {
+            perror("udp_socket_write failed");
+        }
+    }
+
+    return NULL;
+}
+
+void* listener_thread_function(void *arg)
+{
+    thread_args *args = (thread_args *)arg;
+    int sd = args->sd;
+    struct sockaddr_in server_addr = args->server_addr;
+    char server_response[BUFFER_SIZE];
+    struct sockaddr_in responder_addr;
+
+    while (1)
+    {
+        int rc = udp_socket_read(sd, &responder_addr, server_response, BUFFER_SIZE);
+        if (rc > 0) {
+            if (rc < BUFFER_SIZE) server_response[rc] = '\0';
+            printf("%s", server_response);
+            fflush(stdout);
+        } else if (rc < 0) {
+            perror("udp_socket_read failed");
+        }
+    }
+
+    return NULL;
 }

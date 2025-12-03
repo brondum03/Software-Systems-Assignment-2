@@ -11,6 +11,13 @@
 #define BUFFER_SIZE 1024
 #define SERVER_PORT 12000
 
+typedef struct client_node {
+    struct sockaddr_in client_address;  //IP + port information
+    char* client_name;
+    struct client_node* next;
+    struct client_node* previous; 
+} client_node;
+
 int set_socket_addr(struct sockaddr_in *addr, const char *ip, int port)
 {
     // This is a helper function that fills
@@ -100,3 +107,32 @@ int udp_socket_write(int sd, struct sockaddr_in *addr, char *buffer, int n)
     int addr_len = sizeof(struct sockaddr_in);
     return sendto(sd, buffer, n, 0, (struct sockaddr *)addr, addr_len);
 }
+
+void parse_input(char *input, char *request_type, char *request_descriptor)
+{
+    char *request_type = strtok(input, "$"); //splits token by " $ "
+    char *request_descriptor = strtok(NULL, "");
+}
+
+//chat_server request handler
+void handle_request(struct client_node *client_list, struct sockaddr_in client_address, char *client_request)
+{
+    
+    
+}
+
+//chat_client request sender
+void send_request(char *input)
+{
+    int sd = udp_socket_open(0); //open UDP socket on any available port
+    struct sockaddr_in server_addr, responder_addr;
+    set_socket_addr(&server_addr, "127.0.0.1", SERVER_PORT); //format server address with local IP and server port
+    char server_response[BUFFER_SIZE];
+    int rc = udp_socket_write(sd, &server_addr, input, BUFFER_SIZE); //send connection request to server from socket sd
+    if (rc > 0)
+    {
+        int rc = udp_socket_read(sd, &responder_addr, server_response, BUFFER_SIZE); //waits for server response
+        printf("server_response: %s", server_response); 
+    }
+}   
+    
