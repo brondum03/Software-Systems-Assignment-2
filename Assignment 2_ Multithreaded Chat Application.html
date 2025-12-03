@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<!-- saved from url=(0061)https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Assignment 2: Multithreaded Chat Application</title>
+
+    <style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style><style id="MJX-CHTML-styles">
+mjx-container[jax="CHTML"] {
+  line-height: 0;
+}
+
+mjx-container [space="1"] {
+  margin-left: .111em;
+}
+
+mjx-container [space="2"] {
+  margin-left: .167em;
+}
+
+mjx-container [space="3"] {
+  margin-left: .222em;
+}
+
+mjx-container [space="4"] {
+  margin-left: .278em;
+}
+
+mjx-container [space="5"] {
+  margin-left: .333em;
+}
+
+mjx-container [rspace="1"] {
+  margin-right: .111em;
+}
+
+mjx-container [rspace="2"] {
+  margin-right: .167em;
+}
+
+mjx-container [rspace="3"] {
+  margin-right: .222em;
+}
+
+mjx-container [rspace="4"] {
+  margin-right: .278em;
+}
+
+mjx-container [rspace="5"] {
+  margin-right: .333em;
+}
+
+mjx-container [size="s"] {
+  font-size: 70.7%;
+}
+
+mjx-container [size="ss"] {
+  font-size: 50%;
+}
+
+mjx-container [size="Tn"] {
+  font-size: 60%;
+}
+
+mjx-container [size="sm"] {
+  font-size: 85%;
+}
+
+mjx-container [size="lg"] {
+  font-size: 120%;
+}
+
+mjx-container [size="Lg"] {
+  font-size: 144%;
+}
+
+mjx-container [size="LG"] {
+  font-size: 173%;
+}
+
+mjx-container [size="hg"] {
+  font-size: 207%;
+}
+
+mjx-container [size="HG"] {
+  font-size: 249%;
+}
+
+mjx-container [width="full"] {
+  width: 100%;
+}
+
+mjx-box {
+  display: inline-block;
+}
+
+mjx-block {
+  display: block;
+}
+
+mjx-itable {
+  display: inline-table;
+}
+
+mjx-row {
+  display: table-row;
+}
+
+mjx-row > * {
+  display: table-cell;
+}
+
+mjx-mtext {
+  display: inline-block;
+}
+
+mjx-mstyle {
+  display: inline-block;
+}
+
+mjx-merror {
+  display: inline-block;
+  color: red;
+  background-color: yellow;
+}
+
+mjx-mphantom {
+  visibility: hidden;
+}
+
+_::-webkit-full-page-media, _:future, :root mjx-container {
+  will-change: opacity;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-c::before {
+  display: block;
+  width: 0;
+}
+
+.MJX-TEX {
+  font-family: MJXZERO, MJXTEX;
+}
+
+.TEX-B {
+  font-family: MJXZERO, MJXTEX-B;
+}
+
+.TEX-I {
+  font-family: MJXZERO, MJXTEX-I;
+}
+
+.TEX-MI {
+  font-family: MJXZERO, MJXTEX-MI;
+}
+
+.TEX-BI {
+  font-family: MJXZERO, MJXTEX-BI;
+}
+
+.TEX-S1 {
+  font-family: MJXZERO, MJXTEX-S1;
+}
+
+.TEX-S2 {
+  font-family: MJXZERO, MJXTEX-S2;
+}
+
+.TEX-S3 {
+  font-family: MJXZERO, MJXTEX-S3;
+}
+
+.TEX-S4 {
+  font-family: MJXZERO, MJXTEX-S4;
+}
+
+.TEX-A {
+  font-family: MJXZERO, MJXTEX-A;
+}
+
+.TEX-C {
+  font-family: MJXZERO, MJXTEX-C;
+}
+
+.TEX-CB {
+  font-family: MJXZERO, MJXTEX-CB;
+}
+
+.TEX-FR {
+  font-family: MJXZERO, MJXTEX-FR;
+}
+
+.TEX-FRB {
+  font-family: MJXZERO, MJXTEX-FRB;
+}
+
+.TEX-SS {
+  font-family: MJXZERO, MJXTEX-SS;
+}
+
+.TEX-SSB {
+  font-family: MJXZERO, MJXTEX-SSB;
+}
+
+.TEX-SSI {
+  font-family: MJXZERO, MJXTEX-SSI;
+}
+
+.TEX-SC {
+  font-family: MJXZERO, MJXTEX-SC;
+}
+
+.TEX-T {
+  font-family: MJXZERO, MJXTEX-T;
+}
+
+.TEX-V {
+  font-family: MJXZERO, MJXTEX-V;
+}
+
+.TEX-VB {
+  font-family: MJXZERO, MJXTEX-VB;
+}
+
+mjx-stretchy-v mjx-c, mjx-stretchy-h mjx-c {
+  font-family: MJXZERO, MJXTEX-S1, MJXTEX-S4, MJXTEX, MJXTEX-A ! important;
+}
+
+@font-face /* 0 */ {
+  font-family: MJXZERO;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff") format("woff");
+}
+
+@font-face /* 1 */ {
+  font-family: MJXTEX;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff") format("woff");
+}
+
+@font-face /* 2 */ {
+  font-family: MJXTEX-B;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Bold.woff") format("woff");
+}
+
+@font-face /* 3 */ {
+  font-family: MJXTEX-I;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff") format("woff");
+}
+
+@font-face /* 4 */ {
+  font-family: MJXTEX-MI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Italic.woff") format("woff");
+}
+
+@font-face /* 5 */ {
+  font-family: MJXTEX-BI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-BoldItalic.woff") format("woff");
+}
+
+@font-face /* 6 */ {
+  font-family: MJXTEX-S1;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff") format("woff");
+}
+
+@font-face /* 7 */ {
+  font-family: MJXTEX-S2;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff") format("woff");
+}
+
+@font-face /* 8 */ {
+  font-family: MJXTEX-S3;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size3-Regular.woff") format("woff");
+}
+
+@font-face /* 9 */ {
+  font-family: MJXTEX-S4;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size4-Regular.woff") format("woff");
+}
+
+@font-face /* 10 */ {
+  font-family: MJXTEX-A;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_AMS-Regular.woff") format("woff");
+}
+
+@font-face /* 11 */ {
+  font-family: MJXTEX-C;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Regular.woff") format("woff");
+}
+
+@font-face /* 12 */ {
+  font-family: MJXTEX-CB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Calligraphic-Bold.woff") format("woff");
+}
+
+@font-face /* 13 */ {
+  font-family: MJXTEX-FR;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Regular.woff") format("woff");
+}
+
+@font-face /* 14 */ {
+  font-family: MJXTEX-FRB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Fraktur-Bold.woff") format("woff");
+}
+
+@font-face /* 15 */ {
+  font-family: MJXTEX-SS;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Regular.woff") format("woff");
+}
+
+@font-face /* 16 */ {
+  font-family: MJXTEX-SSB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Bold.woff") format("woff");
+}
+
+@font-face /* 17 */ {
+  font-family: MJXTEX-SSI;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_SansSerif-Italic.woff") format("woff");
+}
+
+@font-face /* 18 */ {
+  font-family: MJXTEX-SC;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Script-Regular.woff") format("woff");
+}
+
+@font-face /* 19 */ {
+  font-family: MJXTEX-T;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Typewriter-Regular.woff") format("woff");
+}
+
+@font-face /* 20 */ {
+  font-family: MJXTEX-V;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Regular.woff") format("woff");
+}
+
+@font-face /* 21 */ {
+  font-family: MJXTEX-VB;
+  src: url("https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Vector-Bold.woff") format("woff");
+}
+</style></head><body><div class="common-head">
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <!--<base href="/elec50014/">--><base href=".">
+
+        <!-- Style sheets -->
+        <link rel="stylesheet" href="./Assignment 2_ Multithreaded Chat Application_files/prism.css">
+        <link rel="stylesheet" href="./Assignment 2_ Multithreaded Chat Application_files/style.css">
+
+        <!-- Scripts -->
+        <script src="./Assignment 2_ Multithreaded Chat Application_files/prism.js.download"></script>
+        <script src="./Assignment 2_ Multithreaded Chat Application_files/loadCodeAndThemes.js.download"></script>
+        <script src="./Assignment 2_ Multithreaded Chat Application_files/insertCode.js.download"></script>
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async="" src="./Assignment 2_ Multithreaded Chat Application_files/tex-mml-chtml.js.download"></script>
+    </div>
+
+    <!-- Google tag (gtag.js) -->
+    <script async="" src="./Assignment 2_ Multithreaded Chat Application_files/js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-03CDK5R9LR');
+    </script>
+    
+
+
+
+
+    <div class="toc">
+        <section class="toc-content">
+            <h5>Table of Contents</h5>
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#intro">Introduction</a>
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p1">1. Client-Server Communication</a>
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p2">2. Chat Application Requirements</a>
+
+            <div style="margin-left:20px;">
+                <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p2.1">Client-side requirements</a>
+                <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p2.2">Server-side requirements</a>
+                <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p2.3">Synchronization requirements</a>
+                <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p2.4">User Interface options</a>
+            </div>
+
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p3">3. PE 1: History at Connection</a>
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p4">4. PE 2: Remove Inactive Clients</a>
+            <a href="https://sarimbaig01.github.io/elec50014/Docs/Assignment2.html#p5">5. Further Enhancements</a>
+
+        </section>
+    </div>
+
+
+    <h1 class="align-with-statement"> Assignment 2: Multithreaded Chat Application</h1>
+    <section class="statement">
+
+        <!--Intro Div-->
+        <div id="intro">
+            <h2>Introduction</h2>
+
+            <p>The purpose of this assignment is to provide you with an opportunity to do hands-on work in three
+                important areas of software, namely: concurrency, synchronization, and communication over the internet.
+            </p>
+
+            <p>We will begin with the third part first, i.e., communication. The topic of communication will be covered
+                in detail in lectures 15 and 16. For this assignment, however, we will implement only the basic
+                communication we need and abstract away the underlying details.</p>
+
+            <p>Once the basic communication setup is in place, you will need to extend it to complete the implementation
+                of a
+                multithreaded chat server and clients. The requirements will be specified in the following sections.
+            </p>
+
+            <p>Overall, this assignment provides less starter code than Assignment 1. You have
+                relatively more freedom to decide what functions to implement and how to structure your overall
+                solution.</p>
+
+            <p>As with assignment 1, for a 70% mark on this assignment you need to implement the functionalities excluding the PEs correctly. For marks in the range 70–100%, PEs should be implemented.</p>
+
+            <p>Let's begin!</p>
+        </div>
+
+        <div id="p1">
+            <h3><small>1. </small>Client-Server Communication</h3>
+            <p>Both the chat server and clients are software applications on the internet. There is one server and
+                multiple clients. Communication between them is two-way and can be initiated by either the client or the
+                server. In most cases, however, a client starts the communication by sending a request to the server,
+                and the server responds to that request.</p>
+
+            <p>The following picture shows the high-level architecture of the chat application. It is a distributed
+                application. The client and server are typically (though not always) on different machines connected
+                through the internet. During development, however, it is often convenient to run the client and
+                server locally on the same machine.</p>
+
+            <figure style="text-align: center;">
+                <img src="./Assignment 2_ Multithreaded Chat Application_files/chat_arch.png" alt="Chat Application Architecture" style="max-width: 50%; height: auto;">
+                <figcaption>Figure 1: High-level architecture of the chat application</figcaption>
+            </figure>
+
+            <h4>IP and port number</h4>
+            <p>Each machine on the internet — also known as a host — has a unique address called its IP. (There are
+                private and public IPs, along with other complications that we will not delve into at this point.)</p>
+
+            <p>Any process that wishes to communicate over the internet needs to open a socket. Thanks to Unix's
+                "everything is a file" philosophy, opening a socket is very similar to opening a file on disk — using a
+                file descriptor. Furthermore, as all threads within the process share the same file descriptor table,
+                they all have access to the socket.</p>
+
+
+            <p>A socket (of the type we are using in this assignment) is identified by two pieces of information: an
+                IP address and a unique 16-bit number called the port number.</p>
+
+            <p>Together, the IP address and port number used by the socket form the identity of that communication
+                endpoint on the internet. If anyone wishes to send data to it, they send it to this IP and port number
+                combination.</p>
+
+            <p>Naturally, each of our clients and the server open a socket to communicate. The IP address and port
+                number of the server’s socket are known to the clients who use this information to send requests to the
+                server.
+            </p>
+
+            <p>The server, in turn,uses the IP address and port number of an incoming client to communicate back.</p>
+
+            <h4>Client-Server code</h4>
+
+            <p>With these concepts in place, we are now ready to look at some code for client–server communication.</p>
+
+            <p><strong>The code has been explained through comments. Please read these comments carefully to understand
+                    both the code and the related concepts.</strong></p>
+
+            <p>You have been provided with wrapper functions to open a UDP socket, write to it, read from it, and so on.
+                These functions are implemented in a separate file called <code><strong><a href="https://sarimbaig01.github.io/elec50014/c/udp.h" download="/c/udp.h">udp.h</a></strong></code>. Please download the file and read the comments in it
+                also to
+                understand the code.
+            </p>
+
+
+            <!--Communication code-->
+            <p><code><strong>chat_server.c: </strong></code></p>
+            <div class="code-container" data-filename="c/chat_server.c">
+                <div class="code-toolbar"><pre class="language-c" tabindex="0"><code class="language-c">
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"udp.h"</span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+
+    <span class="token comment">// This function opens a UDP socket,</span>
+    <span class="token comment">// binding it to all IP interfaces of this machine,</span>
+    <span class="token comment">// and port number SERVER_PORT</span>
+    <span class="token comment">// (See details of the function in udp.h)</span>
+    <span class="token keyword">int</span> sd <span class="token operator">=</span> <span class="token function">udp_socket_open</span><span class="token punctuation">(</span>SERVER_PORT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token function">assert</span><span class="token punctuation">(</span>sd <span class="token operator">&gt;</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Server main loop</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        <span class="token comment">// Storage for request and response messages</span>
+        <span class="token keyword">char</span> client_request<span class="token punctuation">[</span>BUFFER_SIZE<span class="token punctuation">]</span><span class="token punctuation">,</span> server_response<span class="token punctuation">[</span>BUFFER_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Demo code (remove later)</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Server is listening on port %d\n"</span><span class="token punctuation">,</span> SERVER_PORT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Variable to store incoming client's IP address and port</span>
+        <span class="token keyword">struct</span> <span class="token class-name">sockaddr_in</span> client_address<span class="token punctuation">;</span>
+    
+        <span class="token comment">// This function reads incoming client request from</span>
+        <span class="token comment">// the socket at sd.</span>
+        <span class="token comment">// (See details of the function in udp.h)</span>
+        <span class="token keyword">int</span> rc <span class="token operator">=</span> <span class="token function">udp_socket_read</span><span class="token punctuation">(</span>sd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>client_address<span class="token punctuation">,</span> client_request<span class="token punctuation">,</span> BUFFER_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Successfully received an incoming request</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>rc <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment">// Demo code (remove later)</span>
+            <span class="token function">strcpy</span><span class="token punctuation">(</span>server_response<span class="token punctuation">,</span> <span class="token string">"Hi, the server has received: "</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">strcat</span><span class="token punctuation">(</span>server_response<span class="token punctuation">,</span> client_request<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">strcat</span><span class="token punctuation">(</span>server_response<span class="token punctuation">,</span> <span class="token string">"\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// This function writes back to the incoming client,</span>
+            <span class="token comment">// whose address is now available in client_address, </span>
+            <span class="token comment">// through the socket at sd.</span>
+            <span class="token comment">// (See details of the function in udp.h)</span>
+            rc <span class="token operator">=</span> <span class="token function">udp_socket_write</span><span class="token punctuation">(</span>sd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>client_address<span class="token punctuation">,</span> server_response<span class="token punctuation">,</span> BUFFER_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// Demo code (remove later)</span>
+            <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Request served...\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre><div class="toolbar"><div class="toolbar-item"><span>C</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <p><code><strong>chat_client.c: </strong></code></p>
+            <div class="code-container" data-filename="c/chat_client.c">
+                <div class="code-toolbar"><pre class="language-c" tabindex="0"><code class="language-c">
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h&gt;</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"udp.h"</span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">CLIENT_PORT</span> <span class="token expression"><span class="token number">10000</span></span></span>
+
+<span class="token comment">// client code</span>
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token keyword">int</span> argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>argv<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// This function opens a UDP socket,</span>
+    <span class="token comment">// binding it to all IP interfaces of this machine,</span>
+    <span class="token comment">// and port number CLIENT_PORT.</span>
+    <span class="token comment">// (See details of the function in udp.h)</span>
+    <span class="token keyword">int</span> sd <span class="token operator">=</span> <span class="token function">udp_socket_open</span><span class="token punctuation">(</span>CLIENT_PORT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Variable to store the server's IP address and port</span>
+    <span class="token comment">// (i.e. the server we are trying to contact).</span>
+    <span class="token comment">// Generally, it is possible for the responder to be</span>
+    <span class="token comment">// different from the server requested.</span>
+    <span class="token comment">// Although, in our case the responder will</span>
+    <span class="token comment">// always be the same as the server.</span>
+    <span class="token keyword">struct</span> <span class="token class-name">sockaddr_in</span> server_addr<span class="token punctuation">,</span> responder_addr<span class="token punctuation">;</span>
+
+    <span class="token comment">// Initializing the server's address.</span>
+    <span class="token comment">// We are currently running the server on localhost (127.0.0.1).</span>
+    <span class="token comment">// You can change this to a different IP address</span>
+    <span class="token comment">// when running the server on a different machine.</span>
+    <span class="token comment">// (See details of the function in udp.h)</span>
+    <span class="token keyword">int</span> rc <span class="token operator">=</span> <span class="token function">set_socket_addr</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>server_addr<span class="token punctuation">,</span> <span class="token string">"127.0.0.1"</span><span class="token punctuation">,</span> SERVER_PORT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Storage for request and response messages</span>
+    <span class="token keyword">char</span> client_request<span class="token punctuation">[</span>BUFFER_SIZE<span class="token punctuation">]</span><span class="token punctuation">,</span> server_response<span class="token punctuation">[</span>BUFFER_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Demo code (remove later)</span>
+    <span class="token function">strcpy</span><span class="token punctuation">(</span>client_request<span class="token punctuation">,</span> <span class="token string">"Dummy Request"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// This function writes to the server (sends request)</span>
+    <span class="token comment">// through the socket at sd.</span>
+    <span class="token comment">// (See details of the function in udp.h)</span>
+    rc <span class="token operator">=</span> <span class="token function">udp_socket_write</span><span class="token punctuation">(</span>sd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>server_addr<span class="token punctuation">,</span> client_request<span class="token punctuation">,</span> BUFFER_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>rc <span class="token operator">&gt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment">// This function reads the response from the server</span>
+        <span class="token comment">// through the socket at sd.</span>
+        <span class="token comment">// In our case, responder_addr will simply be</span>
+        <span class="token comment">// the same as server_addr.</span>
+        <span class="token comment">// (See details of the function in udp.h)</span>
+        <span class="token keyword">int</span> rc <span class="token operator">=</span> <span class="token function">udp_socket_read</span><span class="token punctuation">(</span>sd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>responder_addr<span class="token punctuation">,</span> server_response<span class="token punctuation">,</span> BUFFER_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// Demo code (remove later)</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"server_response: %s"</span><span class="token punctuation">,</span> server_response<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre><div class="toolbar"><div class="toolbar-item"><span>C</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <h4>Build and run</h4>
+            <p>Place the files <code><strong>chat_server.c</strong></code>, <code><strong>chat_client.c</strong></code>,
+                and <code><strong>udp.h</strong></code> in your
+                working directory, then compile them as follows:</p>
+
+            <div class="code-container" data-filename="inline">
+                <div class="code-toolbar"><pre class="language-bash" tabindex="0"><code class="language-bash">$ gcc chat_client.c <span class="token parameter variable">-o</span> chat_client</code></pre><div class="toolbar"><div class="toolbar-item"><span>Bash</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+                <div class="code-toolbar"><pre class="language-bash" tabindex="0"><code class="language-bash">$ gcc chat_server.c <span class="token parameter variable">-o</span> chat_server</code></pre><div class="toolbar"><div class="toolbar-item"><span>Bash</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <p>Start by running the server as a background process:</p>
+
+            <div class="code-container" data-filename="inline">
+                <div class="code-toolbar"><pre class="language-bash" tabindex="0"><code class="language-bash">$ ./chat_server <span class="token operator">&amp;</span></code></pre><div class="toolbar"><div class="toolbar-item"><span>Bash</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <p>Note the process ID (PID) of the server so that you can terminate it later if needed.</p>
+
+            <p>Alternatively, you could run the server in a separate terminal instance.</p>
+
+            <p>Now run the client:</p>
+
+            <div class="code-container" data-filename="inline">
+                <div class="code-toolbar"><pre class="language-bash" tabindex="0"><code class="language-bash">$ ./chat_client</code></pre><div class="toolbar"><div class="toolbar-item"><span>Bash</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <p>Examine the output and observe how the client and server interact.</p>
+
+            <p>To terminate the server when it is running as a background process (for example, if its process ID is
+                63553):</p>
+
+            <div class="code-container" data-filename="inline">
+                <div class="code-toolbar"><pre class="language-bash" tabindex="0"><code class="language-bash">$ <span class="token function">kill</span> <span class="token number">63553</span></code></pre><div class="toolbar"><div class="toolbar-item"><span>Bash</span></div><div class="toolbar-item"><button class="copy-to-clipboard-button" type="button" data-copy-state="copy"><span>Copy</span></button></div></div></div>
+            </div>
+
+            <h4>Try a few variations</h4>
+            <p>Before moving on to the main assignment, it is useful to experiment with a few variations in
+                the communication code to gain a deeper understanding of how it works. These are optional, but useful.
+            </p>
+
+            <p>For example, try the following:</p>
+            <ul>
+                <li>Run two client processes with different port numbers, and have the server print each incoming
+                    client’s port
+                    number.
+                </li>
+                <li>Modify the server so that it includes the client’s IP address in its response (in
+                    <code><strong>server_response</strong></code>), and observe the
+                    result on the client side.
+                </li>
+                <li>Send a string to the server (in <code><strong>client_request</strong></code>), have the server
+                    detect whether it is in lower, upper, or mixed case, and return
+                    the result (in <code><strong>server_response</strong></code>) for the client to print.</li>
+            </ul>
+        </div>
+
+        <div id="p2">
+            <h3><small>2. </small>Chat Application Requirements</h3>
+            <p>In this section I outline the requirements for a multi-threaded, multi-client chat application. The
+                requirements are presented first for the client side and then for the server side.</p>
+            <p>As mentioned in the introduction, no starter code is provided from here on. However, the requirements are
+                modular and
+                detailed enough that you can create your own design based on them.</p>
+            <p>At the core of the application is the client–server communication described above.</p>
+            <p>For the concurrency and synchronization aspects of the code, please refer to the relevant
+                examples in lectures 5–8.</p>
+
+            <h4 id="p2.1">Client-side requirements</h4>
+            <p>Each client:</p>
+            <ul>
+                <li>Binds to an available UDP port (any free port). The port must be unique for each client running on
+                    the same machine.</li>
+                <li>Spawns (at least) two threads:
+                    <ul>
+                        <li><strong>Sender thread:</strong> Reads user input (e.g., <code>say$ Hello, I'm here!</code>
+                            or
+                            <code>sayto$ Bob How are you?</code>) and sends the full request string to the server. The
+                            part of the message before the first <code><strong>$</strong></code> is interpreted as the
+                            <strong>request type</strong> and the part after it is the <strong>request content</strong>.
+                        </li>
+                        <li><strong>Listener thread:</strong> Waits for incoming responses from the server and takes the
+                            appropriate action when a response is received (e.g., displaying a chat message on screen).
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Supports the following request types,</strong> (entered by the user):
+                    <br><br>
+                    <table border="1" cellpadding="8" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Request</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>conn$ client_name</strong></code></pre>
+                                </td>
+                                <td>Connect to the chat with the given name.</td>
+                                <td>
+                                    <pre><code>conn$ Alice</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>say$ msg</strong></code></pre>
+                                </td>
+                                <td>Send a message to all connected clients.</td>
+                                <td>
+                                    <pre><code>say$ Hello everyone!</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>sayto$ recipient_name msg</strong></code></pre>
+                                </td>
+                                <td>Send a private message to a specific client.</td>
+                                <td>
+                                    <pre><code>sayto$ Bob How are you?</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>mute$ client_name</strong></code></pre>
+                                </td>
+                                <td>Mute messages from the specified client.</td>
+                                <td>
+                                    <pre><code>mute$ Bob</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>unmute$ client_name</strong></code></pre>
+                                </td>
+                                <td>Unmute the specified client.</td>
+                                <td>
+                                    <pre><code>unmute$ Bob</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>rename$ new_name</strong></code></pre>
+                                </td>
+                                <td>Change the client’s name.</td>
+                                <td>
+                                    <pre><code>rename$ Alice123</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>disconn$</strong></code></pre>
+                                </td>
+                                <td>Disconnect from the server.</td>
+                                <td>
+                                    <pre><code>disconn$</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre><code><strong>kick$ client_name</strong></code></pre>
+                                </td>
+                                <td>Request to remove another client (only a special admin client can use kick). For
+                                    simplicity, we reserve port number <strong>6666</strong> for admin client.</td>
+                                <td>
+                                    <pre><code>kick$ Bob</code></pre>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </li>
+            </ul>
+
+            <h4 id="p2.2">Server-side requirements</h4>
+            <p>The server:</p>
+            <ul>
+                <li>Binds to UDP port <strong>12000</strong> (known to all clients).</li>
+
+                <li>Spawns a <strong>listener thread</strong> that continuously waits for incoming UDP packets from
+                    clients.</li>
+
+                <li>Maintains a <strong>linked list shared by all client threads</strong> (synchronization requirements
+                    provided below).
+                    Each node of the list contains (at least) the client’s IP, port number, and chat name, plus any
+                    other client-specific information you deem appropriate as you expand functionalities.</li>
+
+
+                <li>Spawns an appropriate request-servicing thread for each incoming client, with each thread
+                    <strong>handling one of the following requests:</strong><br><br>
+
+                    <table border="1" cellpadding="8" cellspacing="0" style="width:100%; table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th style="width:30%;">Request</th>
+                                <th style="width:40%;">Server Action</th>
+                                <th style="width:30%;">Example Response</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>conn$ client_name</strong></code></pre>
+                                </td>
+                                <td>Add the new client (IP, port, name) to the shared linked list; reply with
+                                    confirmation.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>Hi Alice, you have successfully connected to the chat</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>say$ msg</strong></code></pre>
+                                </td>
+                                <td>Broadcast the message to all connected clients.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>Alice: Hello everyone!</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>sayto$&nbsp;recipient_name&nbsp;msg</strong></code></pre>
+                                </td>
+                                <td>Send the message only to the specified recipient.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>Alice: How are you?</code></pre>
+                                    (delivered only to Bob)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>disconn$</strong></code></pre>
+                                </td>
+                                <td>Remove the client from the linked list; confirm disconnection.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>Disconnected. Bye!</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>mute$ client_name</strong></code></pre>
+                                </td>
+                                <td>Record that messages from the specified client should be ignored for this requester.
+                                </td>
+                                <td>(no direct response; effect seen in future broadcasts)</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>unmute$ client_name</strong></code></pre>
+                                </td>
+                                <td>Remove the mute setting so messages are received again.</td>
+                                <td>(no direct response; effect seen in future broadcasts)</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>rename$ new_name</strong></code></pre>
+                                </td>
+                                <td>Update the client’s name in the linked list; confirm the change.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>You are now known as Alice123</code></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code><strong>kick$ client_name</strong></code></pre>
+                                </td>
+                                <td>(Admin only) Remove the specified client and notify them; broadcast removal.</td>
+                                <td>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>You have been removed from the chat</code></pre>
+                                    (to Bob)<br><br>
+                                    <pre style="white-space:pre-wrap; word-wrap:break-word; margin:0;"><code>Bob has been removed from the chat</code></pre>
+                                    (to all)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Design note:</strong> One clean way to implement this would be to write one function
+                        per request type, and spawn a thread for the appropriate function for an incoming client
+                        depending upon their request type.</p>
+                </li>
+            </ul>
+
+            <h4 id="p2.3">Synchronization requirements</h4>
+            <ul>
+                <li>The server’s linked list of clients is accessed by multiple threads and must implement mutual
+                    exclusion around critical sections.</li>
+
+                <li>For this purpose you could use the pthread implementation of a <strong>reader–writer lock</strong>. If instead you prefer using condition variables, or semaphores, to build your own reader-writer lock (as described in lecture 8), you can do that as well. For the pthread reader-writer lock, please explore the functions: <strong><code>pthread_rwlock_rdlock</code></strong>, <strong><code>pthread_rwlock_wrlock</code></strong>, and <strong><code>pthread_rwlock_unlock</code></strong>.
+                    <ul>
+                        <li>For example, <strong>reader threads</strong> include those that:
+                            <ul>
+                                <li>Broadcast messages to all connected clients</li>
+                                <li>Look up a specific client for <code>sayto</code></li>
+                                <li>Read muted clients of a specific client</li>
+                            </ul>
+                        </li>
+                        <li>Similarly, <strong>writer threads</strong> include those that:
+                            <ul>
+                                <li>Add or remove clients as they connect or disconnect respectively</li>
+                                <li>Rename or kick clients</li>
+                                <li>Add or remove muted users for specific clients</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4 id="p2.4">User interface options</h4>
+            <p>Figure 2 below shows the user interface expected for the chat_client process.</p>
+            <figure style="text-align: center;">
+                <img src="./Assignment 2_ Multithreaded Chat Application_files/chat_ui.png" alt="Chat Client Interface" style="max-width: 50%; height: auto;">
+                <figcaption>Figure 2: The Client-side interface</figcaption>
+            </figure>
+            <p>Your interface does not need to be exactly the same, but it should separate the terminal window into
+                two areas: one for user input and the other for displaying the chat. The chat may appear even while a
+                user
+                is typing their message.</p>
+
+            <p>This part of the assignment is information-heavy, i.e., you should look up appropriate references
+               to learn how functions like <code>printf</code> can be used to print at specific
+                areas of the screen.
+                You may also explore suitable C libraries that can help create such an interface.</p>
+            
+            <h5>Alternative option</h5>
+           <p>Alternatively, you can simplify the interface by using two terminal windows. In this case, write all incoming chat messages to a separate text file called <strong><code>iChat.txt</code></strong>. This means you will need to open the file for writing and append each new message as it arrives. This way, the input reading thread can keep hold of one terminal window while the incoming chat is directed to the file. You can then view the chat live by running a command such as <strong><code>tail -f iChat.txt</code></strong> in the other terminal window.</p>
+            <p>Figure 3 below shows a demo of what this interface might look like inside vscode.</p>
+            <figure style="text-align: center;">
+    <video src="mov/int_demo.mov" controls="" autoplay="" loop="" muted="" style="max-width: 70%; height: auto;">
+        Your browser does not support the video tag.
+    </video>
+    <figcaption>Figure 3: Interaction demo of the chat client</figcaption>
+</figure>   
+        </div>
+
+        <div id="p3">
+            <h3><small>3. Proposed Extension 1: </small>History at Connection</h3>
+
+            <p>When a new client connects to the chat, they should be shown the last 15 broadcast messages exchanged in
+                the chat prior to their arrival. This feature helps new users to catch up with recent conversation upon
+                joining the chat.</p>
+
+            <p>The messages are drawn from a shared <strong>circular buffer</strong> on the server, maintaining the
+                15 most recent broadcasted messages. Naturally, the buffer must implement mutual exclusion since
+                multiple threads may read from or write to it concurrently.</p>
+        </div>
+
+        <div id="p4">
+            <h3><small>4. Proposed Extension 2: </small>Remove Inactive Clients</h3>
+            <p>To ensure active participation and allow removal of inactive clients, the server monitors client activity
+                using the following approach:</p>
+
+            <ul>
+                <li>The server maintains a suitable data structure of <strong>(last_active_time, client)</strong> pairs,
+                    allowing it to efficiently find the least recently active client.</li>
+                <li>If the least recently active client exceeds a predefined inactivity threshold (for example, 5
+                    minutes), the
+                    server sends a <code><strong>ping$</strong></code> message to that client.</li>
+                <li>If a <code><strong>ret-ping$</strong></code> response is not received, the server removes the client
+                    from the chat.</li>
+            </ul>
+
+            <p><strong>Note on the Data Structure:</strong>You may use any ordered data structure to implement this
+                feature (ordered on timestamp values). However, an ideal data structure would be a
+                <strong>min-heap</strong> (the minimum timestamp being at the top of
+                the heap). The data structure must be <strong>thread-safe</strong>, as it may be accessed by multiple
+                threads (e.g., each incoming client request will update that client’s timestamp, and the ping monitoring
+                thread will read the timestamp and remove it if that client does not respond to the
+                <code><strong>ping$</strong></code>, etc.).
+            </p>
+        </div>
+
+        <div id="p5">
+            <h3><small>5.</small> Further Enhancements</h3>
+            <p>These enhancements are not expected to be implemented in this assignment. However, I list them here for
+                the interested students who may want to add more programmatically challenging features to develop a
+                fuller
+                application in the future.</p>
+
+
+            <p>Here are some possible directions for further development:</p>
+
+            <ul>
+                <li><strong>Reconnection with state preservation:</strong>
+                    Allow clients to reconnect with their previous identity and retrieve their state (e.g., muted
+                    clients, private message history --- that does not include messages from muted clients, and includes
+                    messages previously sent to this client using <code><strong>sayto$</strong></code> etc.). You could
+                    use text files or database to implement persistence.
+                </li>
+
+                <li><strong>Efficient data structures:</strong>
+                    Replace the server’s linked list of clients with a height-balanced tree (e.g., AVL or red-black
+                    tree) to improve the performance of search, add, and remove operations. This could result in
+                    significant performance improvement if there are hundreds of clients.
+                </li>
+
+                <li><strong>Reliable communication layer:</strong>
+                    UDP is unreliable, i.e., packets may be corrupted, lost, or delivered out of order. Implement
+                    reliability mechanisms over UDP (e.g., acknowledgments, retransmissions) or switch to TCP
+                    to ensure message delivery and ordering.
+                </li>
+
+                <li><strong>Chat rooms:</strong>
+                    Support creation of multiple chat rooms. Clients can join specific rooms, and messages are broadcast
+                    within the room rather than globally.
+                </li>
+            </ul>
+        </div>
+        <hr>
+        <p style="text-align: center; font-style: color: #555; margin-top: 2em;">
+            — End of Statement —
+        </p>
+    </section>
+
+
+</body></html>
