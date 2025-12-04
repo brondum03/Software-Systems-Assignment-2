@@ -1,4 +1,4 @@
-// brandon - refer to notes.md for explanation
+// brandon - refer to readme.md for explanation
 // on threading, reader writer locking
 
 #include <stdio.h>
@@ -8,7 +8,7 @@
 #include <assert.h>
 #include "udp.h"
 
-// initialise a reader writer lock for the shared client list (more in notes.md)
+// initialise a reader writer lock for the shared client list (more in readme.md)
 pthread_rwlock_t client_list_lock = PTHREAD_RWLOCK_INITIALIZER;
 client_node *client_list_head = NULL;
 
