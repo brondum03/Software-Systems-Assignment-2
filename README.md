@@ -20,6 +20,7 @@ pthread_rwlock_wrlock - writer lock, exclusive, only one writer thread can hold 
 pthread_rwlock_unlock - releases lock. for read lock, decreases the reader count, but lock will remain read-locked until reader count is 0. if the write lock releases, the lock is completely free
 
 ===== SERVER =====
+
 request_args structure (to be passed to each request worker thread)
 1. socket descriptor (int)
 2. client_addr (struct sockaddr_in)

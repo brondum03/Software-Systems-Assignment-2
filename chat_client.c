@@ -94,18 +94,3 @@ void* listener_thread_function(void *arg)
 
     return NULL;
 }
-
-//chat_client request sender
-void send_request(char *input)
-{
-    int sd = udp_socket_open(0); //open UDP socket on any available port
-    struct sockaddr_in server_addr, responder_addr;
-    set_socket_addr(&server_addr, "127.0.0.1", SERVER_PORT); //format server address with local IP and server port
-    char server_response[BUFFER_SIZE];
-    int rc = udp_socket_write(sd, &server_addr, input, BUFFER_SIZE); //send connection request to server from socket sd
-    if (rc > 0)
-    {
-        int rc = udp_socket_read(sd, &responder_addr, server_response, BUFFER_SIZE); //waits for server response
-        printf("server_response: %s", server_response); 
-    }
-}   

@@ -106,6 +106,39 @@ void broadcast_message(int sd, char *message, struct sockaddr_in *exclude_addr) 
     pthread_rwlock_unlock(&client_list_lock);
 }
 
+int is_muted(client_node *client, char *muted_name) {
+    mute_node *curr = client->mute_list;
+    while (curr) {
+        if (strcmp(curr->username, muted_name) == 0) {
+            return 1;
+        }
+        curr = curr->next;
+    }
+    return 0;
+}
+
+void add_mute(client_node *client, char *muted_name) {
+    if (is_muted(client, muted_name)) return;
+    mute_node *new_mute = malloc(sizeof(mute_node));
+    strcpy(new_mute->username, muted_name);
+    new_mute->next = client->mute_list;
+    client->mute_list = new_mute;
+}
+
+void remove_mute(client_node *client, char *muted_name) {
+    mute_node *curr = client->mute_list;
+    mute_node *prev = NULL;
+    while (curr) {
+        if (strcmp(curr->username, muted_name) == 0) {
+            if (prev) prev->next = curr->next;
+            else client->mute_list = curr->next;
+            free(curr);
+            return;
+        }
+        prev = curr;
+        curr = curr->next;
+    }
+}
 
 // ===== HANDLE REQUESTS =====
 typedef struct{
@@ -163,7 +196,10 @@ void* handle_sayto_request(void *arg) {
     client_node *recipient = find_client_by_name(recipient_name);
 
     if (recipient && sender) {
-        snprintf(response, BUFFER_SIZE, "%s: %s\n", sender->client_name, message);
+        strncpy(response, sender->client_name, BUFFER_SIZE - 1);
+        strncat(response, ": ", BUFFER_SIZE - strlen(response) - 1);
+        strncat(response, message, BUFFER_SIZE - strlen(response) - 2);
+        strncat(response, "\n", BUFFER_SIZE - strlen(response) - 1);
         udp_socket_write(sd, &recipient->client_address, response, strlen(response) + 1);
     }
 
@@ -171,12 +207,63 @@ void* handle_sayto_request(void *arg) {
     return NULL;
 }
 
-void* handle_disconn_request(void *arg)
-{
+void* handle_mute_request(void *arg) {
+    request_args *args = (request_args *)arg;
+    struct sockaddr_in client_addr = args->client_addr;
+    char *mute_name = args->request_content;
+
+    pthread_rwlock_wrlock(&client_list_lock);
+    client_node *client = find_client_by_addr(client_addr);
+    if (client) {
+        add_mute(client, mute_name);
+    }
+    pthread_rwlock_unlock(&client_list_lock);
+
+    free(args);
+    return NULL;
+}
+
+void* handle_unmute_request(void *arg) {
+    request_args *args = (request_args *)arg;
+    struct sockaddr_in client_addr = args->client_addr;
+    char *unmute_name = args->request_content;
+
+    pthread_rwlock_wrlock(&client_list_lock);
+    client_node *client = find_client_by_addr(client_addr);
+    if (client) {
+        remove_mute(client, unmute_name);
+    }
+    pthread_rwlock_unlock(&client_list_lock);
+
+    free(args);
+    return NULL;
+}
+
+void* handle_rename_request(void *arg) {
     request_args *args = (request_args *)arg;
     int sd = args->sd;
     struct sockaddr_in client_addr = args->client_addr;
-    char *client_name = args->request_content;
+    char *new_name = args->request_content;
+    char response[BUFFER_SIZE];
+
+    pthread_rwlock_wrlock(&client_list_lock);
+    client_node *client = find_client_by_addr(client_addr);
+    if (client) {
+        free(client->client_name);
+        client->client_name = strdup(new_name);
+        snprintf(response, BUFFER_SIZE, "You are now known as %s\n", new_name);
+        udp_socket_write(sd, &client_addr, response, strlen(response) + 1);
+    }
+    pthread_rwlock_unlock(&client_list_lock);
+
+    free(args);
+    return NULL;
+}
+
+void* handle_disconn_request(void *arg) {
+    request_args *args = (request_args *)arg;
+    int sd = args->sd;
+    struct sockaddr_in client_addr = args->client_addr;
     char response[BUFFER_SIZE];
     char *client_name = NULL;
 
@@ -193,6 +280,35 @@ void* handle_disconn_request(void *arg)
         udp_socket_write(sd, &client_addr, response, strlen(response) + 1);
         free(client_name);
     }
+
+    free(args);
+    return NULL;
+}
+
+void* handle_kick_request(void *arg) {
+    request_args *args = (request_args *)arg;
+    int sd = args->sd;
+    struct sockaddr_in client_addr = args->client_addr;
+    char *kick_name = args->request_content;
+    char response[BUFFER_SIZE];
+
+    // Check if requester is admin (port 6666)
+    if (ntohs(client_addr.sin_port) != 6666) {
+        free(args);
+        return NULL;
+    }
+
+    client_node *kickee = find_client_by_name(kick_name);
+    if (kickee) {
+        strcpy(response, "You have been removed from the chat\n");
+        udp_socket_write(sd, &kickee->client_address, response, strlen(response) + 1);
+        
+        snprintf(response, BUFFER_SIZE, "%s has been removed from the chat\n", kick_name);
+        broadcast_message(sd, response, NULL);
+        
+        remove_client_by_name(kick_name);
+    }
+
     free(args);
     return NULL;
 }
@@ -220,16 +336,29 @@ int main(int argc, char *argv[])
             
             pthread_t handler_tid;
 
-            if (strcmp(request_type, "conn") == 0){
+            if (strcmp(request_type, "conn") == 0) {
                 pthread_create(&handler_tid, NULL, handle_conn_request, args);
                 pthread_detach(handler_tid);
-            }
-            if (strcmp(request_type, "say") == 0){
+            } else if (strcmp(request_type, "say") == 0) {
                 pthread_create(&handler_tid, NULL, handle_say_request, args);
                 pthread_detach(handler_tid);
-            }
-            if (strcmp(request_type, "disconn") == 0){
+            } else if (strcmp(request_type, "sayto") == 0) {
+                pthread_create(&handler_tid, NULL, handle_sayto_request, args);
+                pthread_detach(handler_tid);
+            } else if (strcmp(request_type, "mute") == 0) {
+                pthread_create(&handler_tid, NULL, handle_mute_request, args);
+                pthread_detach(handler_tid);
+            } else if (strcmp(request_type, "unmute") == 0) {
+                pthread_create(&handler_tid, NULL, handle_unmute_request, args);
+                pthread_detach(handler_tid);
+            } else if (strcmp(request_type, "rename") == 0) {
+                pthread_create(&handler_tid, NULL, handle_rename_request, args);
+                pthread_detach(handler_tid);
+            } else if (strcmp(request_type, "disconn") == 0) {
                 pthread_create(&handler_tid, NULL, handle_disconn_request, args);
+                pthread_detach(handler_tid);
+            } else if (strcmp(request_type, "kick") == 0) {
+                pthread_create(&handler_tid, NULL, handle_kick_request, args);
                 pthread_detach(handler_tid);
             }
         }
